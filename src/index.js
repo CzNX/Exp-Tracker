@@ -1,10 +1,30 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import { store } from './app/store';
-import { Provider } from 'react-redux';
-import * as serviceWorker from './serviceWorker';
+import React from "react";
+import "./index.css";
+import App from "./App";
+import { store } from "./app/store";
+import { Provider } from "react-redux";
+import { hydrate } from "./app/transSlice";
+import ReactDOM from "react-dom";
+
+//localstorage stuff for reduxtoolkit
+
+store.subscribe(() => {
+  localStorage.setItem("list", JSON.stringify(store.getState().trans));
+});
+
+const getListFromLocalStorage = () => {
+  try {
+    const persistedState = localStorage.getItem("list");
+    if (persistedState) return JSON.parse(persistedState);
+  } catch (e) {
+    console.log(e);
+  }
+};
+
+const list = getListFromLocalStorage();
+if (list) {
+  store.dispatch(hydrate(list));
+}
 
 ReactDOM.render(
   <React.StrictMode>
@@ -12,10 +32,5 @@ ReactDOM.render(
       <App />
     </Provider>
   </React.StrictMode>,
-  document.getElementById('root')
+  document.getElementById("root")
 );
-
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
